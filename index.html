@@ -1,22 +1,555 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>آلة حاسبة متطورة</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>منصة الاختبارات - المعلم</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* تطبيق box-sizing على جميع العناصر لضمان تناسق الأحجام */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #4CAF50, #2E7D32);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column; /* المحتوى يتراص عمودياً */
+      justify-content: flex-start; /* يبدأ المحتوى من الأعلى */
+      align-items: center; /* لمركزة الـ container نفسه أفقياً إذا كان عرضه أقل من 100% */
+      direction: rtl;
+      text-align: right;
+      overflow-x: hidden; /* منع شريط التمرير الأفقي */
+    }
+
+    .container {
+      background: #212121;
+      padding: 25px 20px; /* مسافات داخلية معقولة من الجوانب */
+      border-radius: 0; /* إزالة الحواف الدائرية ليملأ الشاشة */
+      width: 100%; /* يملأ عرض الشاشة بالكامل */
+      max-width: 500px; /* تحديد أقصى عرض لهاتف كبير، يمكن تعديله */
+      /* إذا أردته أن يملأ الشاشة تمامًا على كل الأجهزة، أزل max-width */
+      box-shadow: none;
+      border: none;
+      flex-grow: 1; /* للسماح للـ container بالتمدد لملء المساحة المتاحة عمودياً */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch; /* لضمان أن العناصر الداخلية تملأ عرض الـ container */
+    }
+
+    h1, h2, h3, h4 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 700;
+      color: #81C784;
+      font-size: 1.6rem;
+    }
+    h2 { font-size: 1.4rem; }
+    h3 { font-size: 1.2rem; }
+    h4 { font-size: 1.1rem; }
+
+    hr {
+      border-top: 1px dashed #444;
+      margin: 20px 0;
+    }
+    input, button, select, textarea {
+      width: 100%;
+      padding: 14px 15px;
+      margin: 8px 0 15px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: 'Cairo', sans-serif;
+    }
+    input[type="text"], input[type="password"], select, textarea, input[type="number"] {
+      background: #333;
+      color: #eee;
+      border: 1px solid #555;
+    }
+    input::placeholder, textarea::placeholder {
+      color: #bbb;
+    }
+    button {
+      background: #4CAF50;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background 0.3s ease, transform 0.2s ease;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    button:hover {
+      background: #388E3C;
+      transform: translateY(-2px);
+    }
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    .hidden { display: none; }
+    .test-item {
+      background: #333;
+      padding: 15px 20px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .test-item:hover {
+      background: #444;
+    }
+    .result-list {
+      background: #333;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      border: 1px solid #555;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .result-list div {
+      padding: 10px 0;
+      border-bottom: 1px dashed #444;
+    }
+    .result-list div:last-child {
+      border-bottom: none;
+    }
+    label {
+      font-weight: 600;
+      color: #81C784;
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+    p {
+      text-align: center;
+      margin-top: 20px;
+      color: #bbb;
+      font-size: 0.95rem;
+    }
+    p a {
+      color: #81C784;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+    p a:hover {
+      color: #4CAF50;
+    }
+    ul#questions-list {
+      list-style: none;
+      padding: 0;
+      margin-top: 10px;
+      border: 1px solid #555;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      background: #2b2b2b;
+    }
+    ul#questions-list li {
+      background: #383838;
+      padding: 12px 15px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      border-bottom: 1px dashed #444;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+    }
+    ul#questions-list li:last-child {
+      border-bottom: none;
+    }
+    .remove-question-btn {
+      background: #D32F2F;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      width: auto;
+      margin: 0 0 0 10px;
+      transition: background 0.3s ease;
+      flex-shrink: 0;
+    }
+    .remove-question-btn:hover {
+      background: #C62828;
+    }
+
+    #create-test-form {
+      background:#2b2b2b;
+      padding:20px;
+      border-radius:10px;
+      border: 1px solid #444;
+      margin-top:20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    }
+  </style>
 </head>
 <body>
-    <div class="calculator">
-        <h1>آلة حاسبة متطورة</h1>
-        <form method="post" action="/calculate">
-            <input type="text" name="expression" placeholder="اكتب العملية هنا" value="{{ expression or '' }}" required>
-            <button type="submit">احسب</button>
-        </form>
-        {% if result is not none %}
-            <div class="result">النتيجة: {{ result }}</div>
-        {% endif %}
-        <p>يمكنك استخدام دوال مثل: <code>sqrt(9), sin(0), cos(0), log(10), pow(2,3)</code></p>
+
+<div class="container">
+
+  <section id="register-section">
+    <h1>تسجيل جديد - معلم</h1>
+    <input type="text" id="register-name" placeholder="الاسم الكامل" />
+    <input type="password" id="register-password" placeholder="كلمة المرور" />
+    <button id="register-btn">تسجيل</button>
+    <p>هل لديك حساب؟ <a href="#" id="to-login">تسجيل دخول</a></p>
+  </section>
+
+  <section id="login-section" class="hidden">
+    <h1>تسجيل دخول - معلم</h1>
+    <input type="text" id="login-name" placeholder="الاسم الكامل" />
+    <input type="password" id="login-password" placeholder="كلمة المرور" />
+    <button id="login-btn">دخول</button>
+    <p>ليس لديك حساب؟ <a href="#" id="to-register">تسجيل جديد</a></p>
+  </section>
+
+  <section id="dashboard-section" class="hidden">
+    <h1>مرحبًا بك، <span id="teacher-name"></span>!</h1>
+    <button id="logout-btn" style="background:#D32F2F;">تسجيل خروج</button>
+    
+    <hr />
+
+    <button id="create-test-btn">إنشاء اختبار جديد</button>
+
+    <div id="create-test-form" class="hidden">
+      <h3>تفاصيل الاختبار</h3>
+      <label for="test-name">اسم الاختبار:</label>
+      <input type="text" id="test-name" placeholder="مثال: اختبار الرياضيات" />
+      
+      <label for="test-grade">الصف:</label>
+      <select id="test-grade">
+        <option value="" disabled selected>اختر الصف</option>
+        <option value="الصف الأول">الصف الأول</option>
+        <option value="الصف الثاني">الصف الثاني</option>
+        <option value="الصف الثالث">الصف الثالث</option>
+        <option value="الصف الرابع">الصف الرابع</option>
+        <option value="الصف الخامس">الصف الخامس</option>
+        <option value="الصف السادس">الصف السادس</option>
+      </select>
+      
+      <label for="test-duration">مدة الاختبار بالدقائق:</label>
+      <input type="number" id="test-duration" min="1" placeholder="مدة الاختبار بالدقائق" />
+      
+      <hr />
+      <h3>إضافة سؤال</h3>
+      <label for="question-text">نص السؤال:</label>
+      <textarea id="question-text" rows="3" placeholder="اكتب السؤال هنا..."></textarea>
+      
+      <label>خيارات الإجابة (4 خيارات):</label>
+      <input type="text" class="option-input" placeholder="الخيار 1" />
+      <input type="text" class="option-input" placeholder="الخيار 2" />
+      <input type="text" class="option-input" placeholder="الخيار 3" />
+      <input type="text" class="option-input" placeholder="الخيار 4" />
+      
+      <label for="correct-answer">رقم الإجابة الصحيحة (1 - 4):</label>
+      <input type="number" id="correct-answer" min="1" max="4" placeholder="مثال: 2" />
+      <button id="add-question-btn" style="background:#2196F3;">إضافة سؤال</button>
+
+      <h4>الأسئلة المضافة حاليًا:</h4>
+      <ul id="questions-list">
+        </ul>
+
+      <button id="save-test-btn" style="background:#4CAF50;">حفظ الاختبار</button>
     </div>
+
+    <div id="tests-list" style="margin-top:30px;">
+      <h2>الاختبارات المنشأة</h2>
+      <div id="tests-container">
+        </div>
+    </div>
+
+  </section>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+  import { getDatabase, ref, set, push, onValue, get, child } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-database.js";
+
+  // إعداد Firebase (تأكد من أن هذه المعلومات صحيحة وغير مكشوفة للعامة في بيئة إنتاج)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAjE-2q6PONBkCin9ZN22gDp9Q8pAH9ZW8",
+    authDomain: "story-97cf7.firebaseapp.com",
+    databaseURL: "https://story-97cf7-default-rtdb.firebaseio.com",
+    projectId: "story-97cf7",
+    storageBucket: "story-97cf7.firebasestorage.app",
+    messagingSenderId: "742801388214",
+    appId: "1:742801388214:web:32a305a8057b0582c5ec17",
+    measurementId: "G-9DPPWX7CF0"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // عناصر DOM
+  const registerSection = document.getElementById("register-section");
+  const loginSection = document.getElementById("login-section");
+  const dashboardSection = document.getElementById("dashboard-section");
+
+  const registerBtn = document.getElementById("register-btn");
+  const loginBtn = document.getElementById("login-btn");
+  const logoutBtn = document.getElementById("logout-btn");
+
+  const toLoginLink = document.getElementById("to-login");
+  const toRegisterLink = document.getElementById("to-register");
+
+  const teacherNameSpan = document.getElementById("teacher-name");
+
+  // إنشاء اختبار
+  const createTestBtn = document.getElementById("create-test-btn");
+  const createTestForm = document.getElementById("create-test-form");
+  const saveTestBtn = document.getElementById("save-test-btn");
+
+  const testNameInput = document.getElementById("test-name");
+  const testGradeSelect = document.getElementById("test-grade");
+  const testDurationInput = document.getElementById("test-duration");
+
+  const questionText = document.getElementById("question-text");
+  const optionInputs = document.querySelectorAll(".option-input");
+  const correctAnswerInput = document.getElementById("correct-answer");
+  const addQuestionBtn = document.getElementById("add-question-btn");
+  const questionsList = document.getElementById("questions-list");
+
+  const testsContainer = document.getElementById("tests-container");
+
+  // متغيرات
+  let currentUser = null;
+  let questionsArray = [];
+
+  // تبديل عرض الأقسام
+  function showSection(section) {
+    registerSection.classList.add("hidden");
+    loginSection.classList.add("hidden");
+    dashboardSection.classList.add("hidden");
+
+    section.classList.remove("hidden");
+  }
+
+  // حفظ بيانات المستخدم بعد التسجيل
+  async function saveUser(name, password) {
+    // تحقق إذا موجود مسبقًا
+    const userRef = ref(db, `users/${name}`);
+    const snapshot = await get(userRef);
+    if (snapshot.exists()) {
+      alert("اسم المستخدم موجود بالفعل، حاول اسم آخر");
+      return false;
+    }
+    await set(userRef, { password: password });
+    return true;
+  }
+
+  // التحقق من بيانات الدخول
+  async function verifyUser(name, password) {
+    const userRef = ref(db, `users/${name}`);
+    const snapshot = await get(userRef);
+    if (!snapshot.exists()) return false;
+    const data = snapshot.val();
+    return data.password === password;
+  }
+
+  // عرض الاختبارات للمعلم
+  function loadTests() {
+    const testsRef = ref(db, `tests/${currentUser}`);
+    onValue(testsRef, (snapshot) => {
+      testsContainer.innerHTML = "";
+      if (!snapshot.exists()) {
+        testsContainer.innerHTML = "<p style='color:#bbb;'>لم تقم بإنشاء أي اختبار بعد. ابدأ بإنشاء اختبار جديد!</p>";
+        return;
+      }
+      const testsData = snapshot.val();
+      for (const testId in testsData) {
+        const test = testsData[testId];
+        const div = document.createElement("div");
+        div.classList.add("test-item");
+        div.innerHTML = `<span>${test.name} - ${test.grade} - مدة: ${test.duration} دقيقة</span>
+                         <button class="view-results-btn" data-testid="${testId}" style="background:#2196F3; margin:0;">عرض النتائج</button>`;
+        testsContainer.appendChild(div);
+      }
+      // إضافة مستمعي الأحداث لأزرار "عرض النتائج" بعد إضافتها إلى DOM
+      document.querySelectorAll('.view-results-btn').forEach(button => {
+        button.onclick = (e) => {
+          e.stopPropagation();
+          showTestResults(button.dataset.testid);
+        };
+      });
+    });
+  }
+
+  // عرض نتائج الطلاب لاختبار معين
+  function showTestResults(testId) {
+    const resultsRef = ref(db, `results/${currentUser}/${testId}`);
+    get(resultsRef).then(snapshot => {
+      if (!snapshot.exists()) {
+        alert("لا توجد نتائج لهذا الاختبار بعد.");
+        return;
+      }
+      const results = snapshot.val();
+      let html = "<div class='result-list'><h3>نتائج الطلاب:</h3>";
+      for (const student in results) {
+        html += `<div>اسم الطالب: <strong>${student}</strong> - الدرجة: <strong>${results[student]}</strong></div>`;
+      }
+      html += "</div>";
+      testsContainer.innerHTML = html + "<button onclick='loadTests()' style='margin-top:15px; background:#666;'>رجوع للاختبارات</button>";
+    });
+  }
+
+  // إضافة سؤال جديد
+  addQuestionBtn.onclick = () => {
+    const question = questionText.value.trim();
+    const options = Array.from(optionInputs).map(input => input.value.trim());
+    const correct = parseInt(correctAnswerInput.value);
+
+    if (!question) { alert("الرجاء كتابة السؤال."); return; }
+    if (options.some(o => o === "")) { alert("جميع الخيارات يجب أن تكون مكتوبة."); return; }
+    if (isNaN(correct) || !(correct >=1 && correct <=4)) { alert("رقم الإجابة الصحيحة يجب أن يكون بين 1 و4."); return; }
+
+    const questionObject = { question, options, correct };
+    questionsArray.push(questionObject);
+    
+    renderQuestionsList();
+
+    questionText.value = "";
+    optionInputs.forEach(input => input.value = "");
+    correctAnswerInput.value = "";
+  };
+
+  function renderQuestionsList() {
+    questionsList.innerHTML = "";
+    questionsArray.forEach((q, index) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<span>${index + 1}. ${q.question}</span>
+                      <button class="remove-question-btn" data-index="${index}">حذف</button>`;
+      questionsList.appendChild(li);
+    });
+
+    document.querySelectorAll('.remove-question-btn').forEach(button => {
+      button.onclick = (e) => {
+        const indexToRemove = parseInt(e.target.dataset.index);
+        questionsArray.splice(indexToRemove, 1);
+        renderQuestionsList();
+      };
+    });
+  }
+
+  saveTestBtn.onclick = async () => {
+    const name = testNameInput.value.trim();
+    const grade = testGradeSelect.value;
+    const duration = testDurationInput.value.trim();
+
+    if (!name || !grade || !duration) {
+      alert("الرجاء تعبئة اسم الاختبار، الصف، والمدة.");
+      return;
+    }
+    if (questionsArray.length === 0) {
+      alert("يجب إضافة سؤال واحد على الأقل.");
+      return;
+    }
+
+    const testsRef = ref(db, `tests/${currentUser}`);
+    const newTestRef = push(testsRef);
+    await set(newTestRef, {
+      name,
+      grade,
+      duration: parseInt(duration),
+      questions: questionsArray
+    });
+
+    alert("تم حفظ الاختبار بنجاح!");
+    testNameInput.value = "";
+    testGradeSelect.value = "";
+    testDurationInput.value = "";
+    questionsList.innerHTML = "";
+    questionsArray = [];
+    createTestForm.classList.add("hidden");
+    loadTests();
+  };
+
+  registerBtn.onclick = async () => {
+    const name = document.getElementById("register-name").value.trim();
+    const password = document.getElementById("register-password").value.trim();
+
+    if (!name || !password) {
+      alert("الرجاء تعبئة الاسم وكلمة المرور.");
+      return;
+    }
+    const success = await saveUser(name, password);
+    if (success) {
+      alert("تم التسجيل بنجاح. يمكنك الآن تسجيل الدخول.");
+      showSection(loginSection);
+    }
+  };
+
+  loginBtn.onclick = async () => {
+    const name = document.getElementById("login-name").value.trim();
+    const password = document.getElementById("login-password").value.trim();
+
+    if (!name || !password) {
+      alert("الرجاء تعبئة الاسم وكلمة المرور.");
+      return;
+    }
+    const verified = await verifyUser(name, password);
+    if (verified) {
+      currentUser = name;
+      teacherNameSpan.textContent = currentUser;
+      showSection(dashboardSection);
+      loadTests();
+      sessionStorage.setItem("loggedInUser", currentUser);
+    } else {
+      alert("اسم المستخدم أو كلمة المرور غير صحيحة.");
+    }
+  };
+
+  logoutBtn.onclick = () => {
+    currentUser = null;
+    sessionStorage.removeItem("loggedInUser");
+    showSection(loginSection);
+  };
+
+  toLoginLink.onclick = e => {
+    e.preventDefault();
+    showSection(loginSection);
+  };
+  toRegisterLink.onclick = e => {
+    e.preventDefault();
+    showSection(registerSection);
+  };
+
+  createTestBtn.onclick = () => {
+    createTestForm.classList.toggle("hidden");
+    testNameInput.value = "";
+    testGradeSelect.value = "";
+    testDurationInput.value = "";
+    questionsList.innerHTML = "";
+    questionsArray = [];
+    questionText.value = "";
+    optionInputs.forEach(input => input.value = "");
+    correctAnswerInput.value = "";
+  };
+
+  window.onload = () => {
+    const savedUser = sessionStorage.getItem("loggedInUser");
+    if (savedUser) {
+      currentUser = savedUser;
+      teacherNameSpan.textContent = currentUser;
+      showSection(dashboardSection);
+      loadTests();
+    } else {
+      showSection(registerSection);
+    }
+  };
+
+</script>
+
 </body>
 </html>
