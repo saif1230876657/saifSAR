@@ -1,0 +1,22 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>آلة حاسبة متطورة</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="calculator">
+        <h1>آلة حاسبة متطورة</h1>
+        <form method="post" action="/calculate">
+            <input type="text" name="expression" placeholder="اكتب العملية هنا" value="{{ expression or '' }}" required>
+            <button type="submit">احسب</button>
+        </form>
+        {% if result is not none %}
+            <div class="result">النتيجة: {{ result }}</div>
+        {% endif %}
+        <p>يمكنك استخدام دوال مثل: <code>sqrt(9), sin(0), cos(0), log(10), pow(2,3)</code></p>
+    </div>
+</body>
+</html>
