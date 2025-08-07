@@ -1,0 +1,21 @@
+{
+  "name": "منصة الاختبارات للمعلم",
+  "short_name": "منصة المعلم",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#3081f7",
+  "description": "أنشئ الاختبارات وتابع نتائج طلابك بكل سهولة.",
+  "icons": [
+    {
+      "src": "https://i.postimg.cc/3RBYLnd3/818334fa-20ba-431a-ad38-6bec7ef02203.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://i.postimg.cc/3RBYLnd3/818334fa-20ba-431a-ad38-6bec7ef02203.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
